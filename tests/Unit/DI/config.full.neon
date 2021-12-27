@@ -31,12 +31,12 @@ services:
 		factory: Orisai\Auth\Authorization\PrivilegeAuthorizer
 		arguments:
 			data: @auth.front.dataBuilder::build()
-	auth.front.renewer: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRenewer
+	auth.front.refresher: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher
 	auth.front.firewall:
 		factory: Orisai\Auth\Authentication\SimpleFirewall
 		arguments:
 			storage: @auth.storage.session
-			renewer: @auth.front.renewer
+			refresher: @auth.front.refresher
 			authorizer: @auth.front.authorizer
 			namespace: front
 
@@ -46,12 +46,12 @@ services:
 		factory: Orisai\Auth\Authorization\PrivilegeAuthorizer
 		arguments:
 			data: @auth.admin.dataBuilder::build()
-	auth.admin.renewer: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRenewer
+	auth.admin.refresher: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher
 	auth.admin.firewall:
 		factory: Orisai\Auth\Authentication\SimpleFirewall
 		arguments:
 			storage: @auth.storage.session
-			renewer: @auth.admin.renewer
+			refresher: @auth.admin.refresher
 			authorizer: @auth.admin.authorizer
 			namespace: admin
 
@@ -59,11 +59,11 @@ services:
 	auth.api.dataBuilder: Orisai\Auth\Authorization\AuthorizationDataBuilder
 	auth.api.authorizerCreator: Tests\OriNette\Auth\Doubles\PrivilegeAuthorizerCreator
 	auth.api.authorizer: @auth.api.authorizerCreator::create(builder: @auth.api.dataBuilder)
-	auth.api.renewer: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRenewer
+	auth.api.refresher: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher
 	auth.api.firewall:
 		factory: Orisai\Auth\Authentication\SimpleFirewall
 		arguments:
 			storage: @auth.storage.array
-			renewer: @auth.api.renewer
+			refresher: @auth.api.refresher
 			authorizer: @auth.api.authorizer
 			namespace: api
