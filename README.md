@@ -1,4 +1,8 @@
-<h1 align="center">Orisai Nette Auth</h1>
+<h1 align="center">
+	<img src="https://github.com/orisai/.github/blob/main/images/repo_title.png" alt="Orisai"/>
+	<br/>
+	Nette Auth
+</h1>
 
 <p align="center">
     <a href="https://github.com/orisai/auth">Orisai Auth</a> integration for <a href="https://nette.org">Nette</a>
