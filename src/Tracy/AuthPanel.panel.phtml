@@ -1,0 +1,23 @@
+<?php declare(strict_types = 1);
+
+use Orisai\Auth\Authentication\Firewall;
+
+/** @var array<int|string, Firewall> $firewalls */
+
+?>
+<div class='tracy-inner'>
+	<div class='tracy-inner-container'>
+		<table>
+			<tr>
+				<td>Firewall</td>
+				<td>Logged in</td>
+			</tr>
+			<?php foreach ($firewalls as $firewall): ?>
+				<tr>
+					<td><?= get_class($firewall) ?></td>
+					<td><?= $firewall->isLoggedIn() ? 'yes' : 'no' ?></td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+	</div>
+</div>
