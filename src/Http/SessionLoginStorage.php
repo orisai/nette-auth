@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace OriNette\Auth;
+namespace OriNette\Auth\Http;
 
 use Nette\Http\Session;
 use Nette\Http\SessionSection;

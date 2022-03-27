@@ -10,7 +10,7 @@ use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Http\Session;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
-use OriNette\Auth\SessionLoginStorage;
+use OriNette\Auth\Http\SessionLoginStorage;
 use OriNette\Auth\Tracy\AuthPanel;
 use OriNette\DI\Definitions\DefinitionsLoader;
 use Orisai\Auth\Authentication\ArrayLoginStorage;

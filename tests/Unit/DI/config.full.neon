@@ -4,7 +4,7 @@ extensions:
 
 services:
 	# storages
-	auth.storage.session: OriNette\Auth\SessionLoginStorage
+	auth.storage.session: OriNette\Auth\Http\SessionLoginStorage
 	auth.storage.array: Orisai\Auth\Authentication\ArrayLoginStorage
 
 	# policies

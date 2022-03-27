@@ -1,12 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace Tests\OriNette\Auth\Unit;
+namespace Tests\OriNette\Auth\Unit\Http;
 
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Http\Session;
 use Nette\Http\UrlScript;
-use OriNette\Auth\SessionLoginStorage;
+use OriNette\Auth\Http\SessionLoginStorage;
 use Orisai\Auth\Authentication\LoginStorage;
 use PHPUnit\Framework\TestCase;
 
