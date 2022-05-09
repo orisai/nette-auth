@@ -62,7 +62,7 @@ final class SessionLoginStorage implements LoginStorage
 			return $this->logins[$namespace];
 		}
 
-		$logins = $this->getSessionSection($namespace)->logins;
+		$logins = $this->getSessionSection($namespace)->get('logins');
 		assert($logins instanceof Logins);
 
 		return $this->logins[$namespace] = $logins;
@@ -70,8 +70,8 @@ final class SessionLoginStorage implements LoginStorage
 
 	private function setDefaults(SessionSection $section): void
 	{
-		$section->version = 2;
-		$section->logins = new Logins();
+		$section->set('version', 2);
+		$section->set('logins', new Logins());
 	}
 
 }
