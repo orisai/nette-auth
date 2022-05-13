@@ -73,4 +73,13 @@ final class SessionLoginStorage implements LoginStorage
 		$section->set('logins', new Logins());
 	}
 
+	public function __destruct()
+	{
+		foreach ($this->logins as $namespace => $login) {
+			if ($login->getCurrentLogin() === null && $login->getExpiredLogins() === []) {
+				$this->session->getSection($this->formatSectionName($namespace))->remove();
+			}
+		}
+	}
+
 }
