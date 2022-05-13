@@ -2,12 +2,17 @@
 
 namespace Tests\OriNette\Auth\Unit\Http;
 
+use Brick\DateTime\Instant;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Http\Session;
 use Nette\Http\UrlScript;
 use OriNette\Auth\Http\SessionLoginStorage;
+use Orisai\Auth\Authentication\Data\CurrentLogin;
+use Orisai\Auth\Authentication\Data\ExpiredLogin;
+use Orisai\Auth\Authentication\IntIdentity;
 use Orisai\Auth\Authentication\LoginStorage;
+use Orisai\Auth\Authentication\LogoutCode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -69,16 +74,48 @@ final class SessionLoginStorageTest extends TestCase
 		self::assertNotSame($loginsAdmin, $loginsPublic);
 	}
 
-	public function testUseExistingSession(): void
+	public function testGetExistingLoginFromSession(): void
 	{
 		$session = $this->createSession();
-
 		$storage = $this->createStorage($session);
+
 		$logins = $storage->getLogins('test');
-		self::assertSame($logins, $storage->getLogins('test'));
+		$login = new CurrentLogin(new IntIdentity(1, []), Instant::now());
+		$logins->setCurrentLogin($login);
 
 		$storage = $this->createStorage($session);
-		self::assertSame($logins, $storage->getLogins('test'));
+		self::assertEquals($logins, $storage->getLogins('test'));
+	}
+
+	public function testRemoveEmptySection(): void
+	{
+		$session = $this->createSession();
+		$storage = $this->createStorage($session);
+
+		$currentLogin = new CurrentLogin(new IntIdentity(1, []), Instant::now());
+		$expiredLogin = new ExpiredLogin($currentLogin, LogoutCode::manual());
+
+		$emptyName = 'Orisai.Auth.Logins/empty';
+		self::assertFalse($session->hasSection($emptyName));
+		$storage->getLogins('empty');
+		self::assertTrue($session->hasSection($emptyName));
+
+		$currentName = 'Orisai.Auth.Logins/current';
+		self::assertFalse($session->hasSection($currentName));
+		$current = $storage->getLogins('current');
+		self::assertTrue($session->hasSection($currentName));
+		$current->setCurrentLogin($currentLogin);
+
+		$expiredName = 'Orisai.Auth.Logins/expired';
+		self::assertFalse($session->hasSection($expiredName));
+		$expired = $storage->getLogins('expired');
+		self::assertTrue($session->hasSection($currentName));
+		$expired->addExpiredLogin($expiredLogin);
+
+		unset($storage);
+		self::assertFalse($session->hasSection($emptyName));
+		self::assertTrue($session->hasSection($currentName));
+		self::assertTrue($session->hasSection($expiredName));
 	}
 
 }
