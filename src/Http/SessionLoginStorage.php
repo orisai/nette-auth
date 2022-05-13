@@ -47,7 +47,6 @@ final class SessionLoginStorage implements LoginStorage
 		$isNew = !$this->session->hasSection($sectionName);
 
 		$section = $this->session->getSection($sectionName);
-		$section->warnOnUndefined = true;
 
 		if ($isNew) {
 			$this->setDefaults($section);

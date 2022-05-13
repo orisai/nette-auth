@@ -1,0 +1,10 @@
+extensions:
+	nette.http: Nette\Bridges\HttpDI\HttpExtension
+	nette.session: Nette\Bridges\HttpDI\SessionExtension
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+
+orisai.auth:
+	authorizationData: @builder::build()
+
+services:
+	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder

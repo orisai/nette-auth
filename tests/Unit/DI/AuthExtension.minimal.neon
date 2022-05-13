@@ -1,0 +1,8 @@
+extensions:
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+
+orisai.auth:
+	authorizationData: @creator::build()
+
+services:
+	creator: Tests\OriNette\Auth\Doubles\AuthorizationDataCreator

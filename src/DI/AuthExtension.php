@@ -4,7 +4,6 @@ namespace OriNette\Auth\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\DI\ContainerBuilder;
-use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Http\Session;
@@ -22,14 +21,13 @@ use Orisai\Auth\Authorization\PrivilegeAuthorizer;
 use Orisai\Auth\Passwords\PasswordEncoder;
 use Orisai\Auth\Passwords\SodiumPasswordEncoder;
 use Orisai\Exceptions\Logic\InvalidArgument;
-use Orisai\Exceptions\Logic\InvalidState;
 use Orisai\Exceptions\Message;
 use ReflectionClass;
 use stdClass;
 use Tracy\Bar;
 use function assert;
-use function get_class;
 use function is_a;
+use function is_array;
 
 /**
  * @property-read stdClass $config
@@ -107,23 +105,7 @@ final class AuthExtension extends CompilerExtension
 		}
 
 		foreach ($builder->findByType(Firewall::class) as $definition) {
-			if ($definition instanceof FactoryDefinition) {
-				$definition = $definition->getResultDefinition();
-			}
-
-			if (!$definition instanceof ServiceDefinition) {
-				$serviceClass = ServiceDefinition::class;
-				$factoryClass = FactoryDefinition::class;
-				$givenClass = get_class($definition);
-				$message = Message::create()
-					->withContext("Configuring service '{$definition->getName()}'.")
-					->withProblem("Only services of type '$serviceClass' and '$factoryClass' are supported," .
-						"'$givenClass' given.");
-
-				throw InvalidArgument::create()
-					->withMessage($message);
-			}
-
+			assert($definition instanceof ServiceDefinition);
 			$definition->addSetup('?->addFirewall(?)', [
 				$panelDefinition,
 				$definition,
@@ -170,13 +152,15 @@ final class AuthExtension extends CompilerExtension
 			assert($definitionName !== null);
 
 			$type = $definition->getType();
-			if ($type === null || !is_a($type, Policy::class, true) || !(new ReflectionClass($type))->isAbstract()) {
-				$message = Message::create()
-					->withContext("Configuring '$definitionName' service.")
-					->withProblem("Service definition is missing a 'type' option and cannot be resolved.")
-					->withSolution("Add option 'type' to the configured key.");
+			assert($type !== null && is_a($type, Policy::class, true));
 
-				throw InvalidState::create()
+			if ((new ReflectionClass($type))->isAbstract()) {
+				$message = Message::create()
+					->withContext("Adding '$definitionName' service to policy manager.")
+					->withProblem('Service type is an abstract class and cannot be resolved.')
+					->withSolution('Add only non-abstract policies to services.');
+
+				throw InvalidArgument::create()
 					->withMessage($message);
 			}
 
@@ -199,7 +183,10 @@ final class AuthExtension extends CompilerExtension
 			$this->prefix('authorizationData'),
 		);
 
-		if (!isset($config->authorizationData['autowired']) && !$authorizationDataDefinition instanceof Reference) {
+		if (
+			(!is_array($config->authorizationData) || !isset($config->authorizationData['autowired']))
+			&& !$authorizationDataDefinition instanceof Reference
+		) {
 			$authorizationDataDefinition->setAutowired();
 		}
 

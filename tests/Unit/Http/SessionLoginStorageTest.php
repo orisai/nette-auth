@@ -18,7 +18,7 @@ final class SessionLoginStorageTest extends TestCase
 
 	private function createSession(): Session
 	{
-		return new Session(new Request(new UrlScript('https://example.com')), new Response());
+		return new Session(new Request(new UrlScript('https://orisai.dev')), new Response());
 	}
 
 	private function createStorage(Session $session): LoginStorage
@@ -26,31 +26,47 @@ final class SessionLoginStorageTest extends TestCase
 		return new SessionLoginStorage($session);
 	}
 
-	public function test(): void
+	public function testBase(): void
+	{
+		$session = $this->createSession();
+		$storage = $this->createStorage($session);
+		$sectionName = 'Orisai.Auth.Logins/public';
+
+		self::assertFalse($storage->alreadyExists('public'));
+		self::assertFalse($session->hasSection($sectionName));
+
+		$logins = $storage->getLogins('public');
+
+		self::assertTrue($storage->alreadyExists('public'));
+		self::assertTrue($session->hasSection($sectionName));
+
+		self::assertNull($logins->getCurrentLogin());
+		self::assertSame([], $logins->getExpiredLogins());
+
+		$section = $session->getSection($sectionName);
+		self::assertSame(2, $section->get('version'));
+		self::assertSame($logins, $section->get('logins'));
+	}
+
+	public function testRegenerateId(): void
 	{
 		$session = $this->createSession();
 		$storage = $this->createStorage($session);
 
-		self::assertFalse($storage->alreadyExists('front'));
-		self::assertFalse($session->hasSection('Orisai.Auth.Logins/front'));
-		$loginsFront = $storage->getLogins('front');
-		self::assertNull($loginsFront->getCurrentLogin());
-		self::assertSame([], $loginsFront->getExpiredLogins());
-		self::assertTrue($storage->alreadyExists('front'));
-		self::assertTrue($session->hasSection('Orisai.Auth.Logins/front'));
-
 		$sessionId = $session->getId();
-
-		self::assertFalse($storage->alreadyExists('admin'));
-		self::assertFalse($session->hasSection('Orisai.Auth.Logins/admin'));
-		$loginsAdmin = $storage->getLogins('admin');
-		self::assertNotSame($loginsAdmin, $loginsFront);
-		self::assertEquals($loginsAdmin, $loginsFront);
-		self::assertTrue($storage->alreadyExists('admin'));
-		self::assertTrue($session->hasSection('Orisai.Auth.Logins/admin'));
-
 		$storage->regenerateSecurityToken('doesnt matter');
 		self::assertNotSame($sessionId, $session->getId());
+	}
+
+	public function testNotConflicting(): void
+	{
+		$session = $this->createSession();
+		$storage = $this->createStorage($session);
+
+		$loginsPublic = $storage->getLogins('public');
+		$loginsAdmin = $storage->getLogins('admin');
+
+		self::assertNotSame($loginsAdmin, $loginsPublic);
 	}
 
 	public function testUseExistingSession(): void

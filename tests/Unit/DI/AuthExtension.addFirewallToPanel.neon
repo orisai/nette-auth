@@ -1,0 +1,17 @@
+extensions:
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+	tracy: Tracy\Bridges\Nette\TracyExtension
+
+orisai.auth:
+	authorizationData: @builder::build()
+	debug:
+		panel: true
+
+services:
+	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder
+
+	firewall:
+		factory: Orisai\Auth\Authentication\SimpleFirewall
+		arguments:
+			namespace: admin
+			refresher: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher()

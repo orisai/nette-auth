@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-use Orisai\Auth\Authentication\Firewall;
+use OriNette\Auth\Tracy\AuthPanel;
 
-/** @var array<int|string, Firewall> $firewalls */
+/** @var AuthPanel $panel */
 
 ?>
 <div class='tracy-inner'>
@@ -12,9 +12,9 @@ use Orisai\Auth\Authentication\Firewall;
 				<td>Firewall</td>
 				<td>Logged in</td>
 			</tr>
-			<?php foreach ($firewalls as $firewall): ?>
+			<?php foreach ($panel->getFirewalls() as $firewall): ?>
 				<tr>
-					<td><?= get_class($firewall) ?></td>
+					<td><?= $firewall->getNamespace() ?></td>
 					<td><?= $firewall->isLoggedIn() ? 'yes' : 'no' ?></td>
 				</tr>
 			<?php endforeach; ?>

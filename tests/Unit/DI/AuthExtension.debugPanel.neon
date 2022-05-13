@@ -1,0 +1,11 @@
+extensions:
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+	tracy: Tracy\Bridges\Nette\TracyExtension
+
+orisai.auth:
+	authorizationData: @builder::build()
+	debug:
+		panel: true
+
+services:
+	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder

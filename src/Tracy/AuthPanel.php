@@ -11,15 +11,7 @@ final class AuthPanel implements IBarPanel
 {
 
 	/** @var array<int|string, Firewall<Identity>> */
-	private array $firewalls;
-
-	/**
-	 * @param Firewall<Identity> $firewall
-	 */
-	public function addFirewall(Firewall $firewall): void
-	{
-		$this->firewalls[] = $firewall;
-	}
+	private array $firewalls = [];
 
 	public function getTab(): string
 	{
@@ -32,10 +24,26 @@ final class AuthPanel implements IBarPanel
 	{
 		return Helpers::capture(function (): void {
 			// phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
-			$firewalls = $this->firewalls;
+			$panel = $this;
 
 			require __DIR__ . '/AuthPanel.panel.phtml';
 		});
+	}
+
+	/**
+	 * @param Firewall<Identity> $firewall
+	 */
+	public function addFirewall(Firewall $firewall): void
+	{
+		$this->firewalls[] = $firewall;
+	}
+
+	/**
+	 * @return array<int|string, Firewall<Identity>>
+	 */
+	public function getFirewalls(): array
+	{
+		return $this->firewalls;
 	}
 
 }

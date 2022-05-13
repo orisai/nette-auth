@@ -1,0 +1,10 @@
+extensions:
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+
+orisai.auth:
+	authorizationData: @builder::build()
+
+services:
+	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder
+
+	abstractPolicy: Tests\OriNette\Auth\Doubles\NotImplementedPolicy

@@ -6,7 +6,7 @@ use OriNette\Auth\DI\LazyPolicyManager;
 use OriNette\DI\Boot\ManualConfigurator;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
-use Tests\OriNette\Auth\Doubles\ArticleEditPolicy;
+use Tests\OriNette\Auth\Doubles\AlwaysPassPolicy;
 use function dirname;
 use function mkdir;
 use const PHP_VERSION_ID;
@@ -30,13 +30,13 @@ final class LazyPolicyManagerTest extends TestCase
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
 		$configurator->setForceReloadContainer();
-		$configurator->addConfig(__DIR__ . '/config.manager.neon');
+		$configurator->addConfig(__DIR__ . '/LazyPolicyManager.neon');
 
 		$container = $configurator->createContainer();
 
 		$manager = $container->getByType(LazyPolicyManager::class);
 
-		self::assertInstanceOf(ArticleEditPolicy::class, $manager->get(ArticleEditPolicy::getPrivilege()));
+		self::assertInstanceOf(AlwaysPassPolicy::class, $manager->get(AlwaysPassPolicy::getPrivilege()));
 
 		$e = null;
 		try {
@@ -49,11 +49,11 @@ final class LazyPolicyManagerTest extends TestCase
 		self::assertSame(
 			$e->getMessage(),
 			<<<'MSG'
-Context: Class Tests\OriNette\Auth\Doubles\ArticleEditPolicy returns privilege
-         article.edit.
+Context: Class Tests\OriNette\Auth\Doubles\AlwaysPassPolicy returns privilege
+         always-pass.
 Problem: It was expected to return not.matching.privilege.
-Solution: Register service policy.article.edit to
-          OriNette\Auth\DI\LazyPolicyManager with article.edit or change the
+Solution: Register service policy.alwaysPass to
+          OriNette\Auth\DI\LazyPolicyManager with always-pass or change the
           privilege returned by class to not.matching.privilege.
 MSG,
 		);

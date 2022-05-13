@@ -1,0 +1,10 @@
+services:
+	policy.alwaysPass: Tests\OriNette\Auth\Doubles\AlwaysPassPolicy
+	policy.invalid.class: stdClass
+
+	auth.policyManager:
+		factory: OriNette\Auth\DI\LazyPolicyManager
+		arguments:
+			serviceMap:
+				always-pass: policy.alwaysPass
+				not.matching.privilege: policy.alwaysPass
