@@ -2,7 +2,8 @@ extensions:
 	orisai.auth: OriNette\Auth\DI\AuthExtension
 
 orisai.auth:
-	authorizationData: @builder::build()
+	authorization:
+		data: @builder::build()
 
 services:
 	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder

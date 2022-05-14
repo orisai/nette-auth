@@ -9,8 +9,5 @@ services:
 	builder:
 		factory: Orisai\Auth\Authorization\AuthorizationDataBuilder
 		setup:
-			- addPrivilege('always-pass')
-			- addPrivilege('never-pass')
-
-	- Tests\OriNette\Auth\Doubles\AlwaysPassPolicy
-	- Tests\OriNette\Auth\Doubles\NeverPassPolicy
+			- addRole('role')
+			- addPrivilege('privilege')

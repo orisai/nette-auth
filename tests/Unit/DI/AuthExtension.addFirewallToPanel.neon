@@ -3,7 +3,8 @@ extensions:
 	tracy: Tracy\Bridges\Nette\TracyExtension
 
 orisai.auth:
-	authorizationData: @builder::build()
+	authorization:
+		data: @builder::build()
 	debug:
 		panel: true
 

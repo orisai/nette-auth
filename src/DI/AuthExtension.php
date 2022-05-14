@@ -7,6 +7,7 @@ use Nette\DI\ContainerBuilder;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Http\Session;
+use Nette\PhpGenerator\Literal;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use OriNette\Auth\Http\SessionLoginStorage;
@@ -14,6 +15,8 @@ use OriNette\Auth\Tracy\AuthPanel;
 use OriNette\DI\Definitions\DefinitionsLoader;
 use Orisai\Auth\Authentication\ArrayLoginStorage;
 use Orisai\Auth\Authentication\Firewall;
+use Orisai\Auth\Authorization\AuthorizationData;
+use Orisai\Auth\Authorization\AuthorizationDataBuilder;
 use Orisai\Auth\Authorization\Authorizer;
 use Orisai\Auth\Authorization\Policy;
 use Orisai\Auth\Authorization\PolicyManager;
@@ -28,6 +31,7 @@ use Tracy\Bar;
 use function assert;
 use function is_a;
 use function is_array;
+use function serialize;
 
 /**
  * @property-read stdClass $config
@@ -42,7 +46,9 @@ final class AuthExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'authorizationData' => DefinitionsLoader::schema()->required(),
+			'authorization' => Expect::structure([
+				'data' => DefinitionsLoader::schema()->nullable(),
+			]),
 			'debug' => Expect::structure([
 				'panel' => Expect::bool(false),
 			]),
@@ -178,13 +184,24 @@ final class AuthExtension extends CompilerExtension
 		ServiceDefinition $policyManagerDefinition
 	): void
 	{
-		$authorizationDataDefinition = $loader->loadDefinitionFromConfig(
-			$config->authorizationData,
-			$this->prefix('authorizationData'),
-		);
+		$dataConfig = $config->authorization->data;
+		if ($dataConfig === null) {
+			$authData = (new AuthorizationDataBuilder())->build();
+			$authorizationDataDefinition = $builder->addDefinition($this->prefix('authorizationData'))
+				->setFactory('\unserialize(\'?\', [?])', [
+					new Literal(serialize($authData)),
+					AuthorizationData::class,
+				])
+				->setType(AuthorizationData::class);
+		} else {
+			$authorizationDataDefinition = $loader->loadDefinitionFromConfig(
+				$dataConfig,
+				$this->prefix('authorizationData'),
+			);
+		}
 
 		if (
-			(!is_array($config->authorizationData) || !isset($config->authorizationData['autowired']))
+			(!is_array($dataConfig) || !isset($dataConfig['autowired']))
 			&& !$authorizationDataDefinition instanceof Reference
 		) {
 			$authorizationDataDefinition->setAutowired();

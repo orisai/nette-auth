@@ -199,6 +199,19 @@ MSG);
 		);
 	}
 
+	public function testAuthDataSet(): void
+	{
+		$configurator = new ManualConfigurator($this->rootDir);
+		$configurator->setForceReloadContainer();
+		$configurator->addConfig(__DIR__ . '/AuthExtension.authData.neon');
+
+		$container = $configurator->createContainer();
+		$authData = $container->getByType(AuthorizationData::class);
+
+		self::assertSame(['role'], $authData->getRoles());
+		self::assertSame(['privilege'], $authData->getPrivileges());
+	}
+
 	public function testAuthDataReference(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);

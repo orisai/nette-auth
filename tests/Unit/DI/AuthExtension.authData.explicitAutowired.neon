@@ -2,9 +2,10 @@ extensions:
 	orisai.auth: OriNette\Auth\DI\AuthExtension
 
 orisai.auth:
-	authorizationData:
-		factory: @builder::build()
-		autowired: false
+	authorization:
+		data:
+			factory: @builder::build()
+			autowired: false
 
 services:
 	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder
