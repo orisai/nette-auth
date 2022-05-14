@@ -38,3 +38,70 @@
 <p>
 
 ##
+
+```php
+namespace App\Admin\Article\View;
+
+use Orisai\Auth\Authentication\Identity;
+use Orisai\Auth\Authentication\SimpleFirewall;
+
+final class ArticleEditController
+{
+
+	private SimpleFirewall $firewall;
+
+	public function __construct(SimpleFirewall $firewall)
+	{
+		$this->firewall = $firewall;
+	}
+
+	public function run(): void
+	{
+		if (!$this->firewall->isAllowed('administration.entry')) {
+			// Not allowed
+		}
+
+		$article = /* get article by ID from request */;
+
+		if (!$this->firewall->isAllowed('article.edit', $article)) {
+			// Not allowed
+		}
+
+		// Is allowed
+	}
+
+}
+
+use App\Core\Article\Article;
+use Orisai\Auth\Authorization\Policy;
+use Orisai\Auth\Authorization\PolicyContext;
+
+/**
+ * @phpstan-implements Policy<Article>
+ */
+final class ArticleEditPolicy implements Policy
+{
+
+	public static function getPrivilege(): string
+	{
+		return 'article.edit';
+	}
+
+	public static function getRequirementsClass(): string
+	{
+		return Article::class;
+	}
+
+	/**
+	 * @param Article $requirements
+	 */
+	public function isAllowed(Identity $identity, object $requirements, PolicyContext $context): bool
+	{
+		$authorizer = $context->getAuthorizer();
+
+		return $authorizer->hasPrivilege($identity, self::getPrivilege())
+			&& $requirements->getAuthor()->getId() === $identity->getId();
+	}
+
+}
+```
