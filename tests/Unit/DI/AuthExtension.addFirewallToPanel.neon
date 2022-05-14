@@ -16,3 +16,4 @@ services:
 		arguments:
 			namespace: admin
 			refresher: Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher()
+			storage: @Orisai\Auth\Authentication\ArrayLoginStorage

@@ -129,10 +129,12 @@ final class AuthExtension extends CompilerExtension
 	private function registerStorages(ContainerBuilder $builder): void
 	{
 		$builder->addDefinition($this->prefix('storage.array'))
-			->setFactory(ArrayLoginStorage::class);
+			->setFactory(ArrayLoginStorage::class)
+			->setAutowired(ArrayLoginStorage::class);
 
 		$builder->addDefinition($this->prefix('storage.session'))
-			->setFactory(SessionLoginStorage::class);
+			->setFactory(SessionLoginStorage::class)
+			->setAutowired(SessionLoginStorage::class);
 	}
 
 	private function unregisterStoragesWithMissingRequirements(ContainerBuilder $builder): void
