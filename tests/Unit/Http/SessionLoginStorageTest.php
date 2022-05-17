@@ -41,6 +41,7 @@ final class SessionLoginStorageTest extends TestCase
 		self::assertFalse($session->hasSection($sectionName));
 
 		$logins = $storage->getLogins('public');
+		self::assertSame($logins, $storage->getLogins('public'));
 
 		self::assertTrue($storage->alreadyExists('public'));
 		self::assertTrue($session->hasSection($sectionName));
