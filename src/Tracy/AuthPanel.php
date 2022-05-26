@@ -15,13 +15,24 @@ final class AuthPanel implements IBarPanel
 
 	public function getTab(): string
 	{
-		return Helpers::capture(static function (): void {
+		if ($this->firewalls === []) {
+			return '';
+		}
+
+		return Helpers::capture(function (): void {
+			// phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
+			$panel = $this;
+
 			require __DIR__ . '/AuthPanel.tab.phtml';
 		});
 	}
 
 	public function getPanel(): string
 	{
+		if ($this->firewalls === []) {
+			return '';
+		}
+
 		return Helpers::capture(function (): void {
 			// phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 			$panel = $this;

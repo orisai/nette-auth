@@ -1,23 +1,32 @@
 <?php declare(strict_types = 1);
 
 use OriNette\Auth\Tracy\AuthPanel;
+use Tracy\Dumper;
 
 /** @var AuthPanel $panel */
 
 ?>
-<div class='tracy-inner'>
-	<div class='tracy-inner-container'>
-		<table>
-			<tr>
-				<td>Firewall</td>
-				<td>Logged in</td>
-			</tr>
-			<?php foreach ($panel->getFirewalls() as $firewall): ?>
-				<tr>
-					<td><?= $firewall->getNamespace() ?></td>
-					<td><?= $firewall->isLoggedIn() ? 'yes' : 'no' ?></td>
-				</tr>
-			<?php endforeach; ?>
-		</table>
-	</div>
+<style>
+	#tracy-debug .orisai-auth-panel-firewall:not(:last-child) {
+		margin-bottom: 1rem;
+	}
+</style>
+
+<div>
+	<?php foreach ($panel->getFirewalls() as $firewall): ?>
+		<div class="orisai-auth-panel-firewall">
+			<h1><?= $firewall->getNamespace() ?> firewall</h1>
+			<div class="tracy-inner">
+				<?php
+				if ($firewall->isLoggedIn()):
+					echo Dumper::toHtml($firewall->getIdentity(), [Dumper::LIVE => true]);
+				else:
+					?>
+					Not logged in
+				<?php
+				endif;
+				?>
+			</div>
+		</div>
+	<?php endforeach; ?>
 </div>

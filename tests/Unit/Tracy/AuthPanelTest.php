@@ -19,8 +19,8 @@ final class AuthPanelTest extends TestCase
 		$panel = new AuthPanel();
 
 		self::assertSame([], $panel->getFirewalls());
-		self::assertNotEmpty($panel->getTab());
-		self::assertNotEmpty($panel->getPanel());
+		self::assertSame('', $panel->getTab());
+		self::assertSame('', $panel->getPanel());
 
 		$firewall = new SimpleFirewall(
 			'a',
