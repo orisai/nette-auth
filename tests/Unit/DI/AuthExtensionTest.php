@@ -17,8 +17,8 @@ use Orisai\Auth\Authorization\Authorizer;
 use Orisai\Auth\Authorization\NoRequirements;
 use Orisai\Auth\Authorization\PolicyManager;
 use Orisai\Auth\Authorization\PrivilegeAuthorizer;
-use Orisai\Auth\Passwords\PasswordEncoder;
-use Orisai\Auth\Passwords\SodiumPasswordEncoder;
+use Orisai\Auth\Passwords\Argon2PasswordHasher;
+use Orisai\Auth\Passwords\PasswordHasher;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
 use Tests\OriNette\Auth\Doubles\AlwaysPassPolicy;
@@ -51,9 +51,9 @@ final class AuthExtensionTest extends TestCase
 
 		$container = $configurator->createContainer();
 
-		$passwordEncoder = $container->getService('orisai.auth.passwordEncoder');
-		self::assertInstanceOf(SodiumPasswordEncoder::class, $passwordEncoder);
-		self::assertSame($passwordEncoder, $container->getByType(PasswordEncoder::class));
+		$passwordHasher = $container->getService('orisai.auth.passwordHasher');
+		self::assertInstanceOf(Argon2PasswordHasher::class, $passwordHasher);
+		self::assertSame($passwordHasher, $container->getByType(PasswordHasher::class));
 
 		$arrayStorage = $container->getService('orisai.auth.storage.array');
 		self::assertInstanceOf(ArrayLoginStorage::class, $arrayStorage);

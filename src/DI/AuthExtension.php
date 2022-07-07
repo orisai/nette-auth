@@ -21,8 +21,8 @@ use Orisai\Auth\Authorization\Authorizer;
 use Orisai\Auth\Authorization\Policy;
 use Orisai\Auth\Authorization\PolicyManager;
 use Orisai\Auth\Authorization\PrivilegeAuthorizer;
-use Orisai\Auth\Passwords\PasswordEncoder;
-use Orisai\Auth\Passwords\SodiumPasswordEncoder;
+use Orisai\Auth\Passwords\Argon2PasswordHasher;
+use Orisai\Auth\Passwords\PasswordHasher;
 use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Message;
 use ReflectionClass;
@@ -62,7 +62,7 @@ final class AuthExtension extends CompilerExtension
 		$config = $this->config;
 		$loader = new DefinitionsLoader($this->compiler);
 
-		$this->registerPasswordEncoder($builder);
+		$this->registerPasswordHasher($builder);
 		$this->registerDebugPanel($config, $builder);
 		$policyManagerDefinition = $this->registerPolicyManager($builder);
 		$this->registerAuthorizer($config, $builder, $loader, $policyManagerDefinition);
@@ -119,11 +119,11 @@ final class AuthExtension extends CompilerExtension
 		}
 	}
 
-	private function registerPasswordEncoder(ContainerBuilder $builder): void
+	private function registerPasswordHasher(ContainerBuilder $builder): void
 	{
-		$builder->addDefinition($this->prefix('passwordEncoder'))
-			->setFactory(SodiumPasswordEncoder::class)
-			->setType(PasswordEncoder::class);
+		$builder->addDefinition($this->prefix('passwordHasher'))
+			->setFactory(Argon2PasswordHasher::class)
+			->setType(PasswordHasher::class);
 	}
 
 	private function registerStorages(ContainerBuilder $builder): void
