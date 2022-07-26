@@ -7,6 +7,7 @@ use Orisai\Auth\Authentication\ArrayLoginStorage;
 use Orisai\Auth\Authentication\SimpleFirewall;
 use Orisai\Auth\Authorization\AuthorizationDataBuilder;
 use Orisai\Auth\Authorization\PrivilegeAuthorizer;
+use Orisai\Auth\Authorization\SimpleAuthorizationDataCreator;
 use Orisai\Auth\Authorization\SimplePolicyManager;
 use PHPUnit\Framework\TestCase;
 use Tests\OriNette\Auth\Doubles\AlwaysPassIdentityRefresher;
@@ -26,7 +27,10 @@ final class AuthPanelTest extends TestCase
 			'a',
 			new ArrayLoginStorage(),
 			new AlwaysPassIdentityRefresher(),
-			new PrivilegeAuthorizer(new SimplePolicyManager(), (new AuthorizationDataBuilder())->build()),
+			new PrivilegeAuthorizer(
+				new SimplePolicyManager(),
+				new SimpleAuthorizationDataCreator(new AuthorizationDataBuilder()),
+			),
 		);
 		$panel->addFirewall($firewall);
 

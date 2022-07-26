@@ -2,7 +2,7 @@
 
 namespace Tests\OriNette\Auth\Unit\Http;
 
-use Brick\DateTime\Instant;
+use DateTimeImmutable;
 use Nette\Http\Request;
 use Nette\Http\Response;
 use Nette\Http\Session;
@@ -81,7 +81,7 @@ final class SessionLoginStorageTest extends TestCase
 		$storage = $this->createStorage($session);
 
 		$logins = $storage->getLogins('test');
-		$login = new CurrentLogin(new IntIdentity(1, []), Instant::now());
+		$login = new CurrentLogin(new IntIdentity(1, []), new DateTimeImmutable());
 		$logins->setCurrentLogin($login);
 
 		$storage = $this->createStorage($session);
@@ -93,7 +93,7 @@ final class SessionLoginStorageTest extends TestCase
 		$session = $this->createSession();
 		$storage = $this->createStorage($session);
 
-		$currentLogin = new CurrentLogin(new IntIdentity(1, []), Instant::now());
+		$currentLogin = new CurrentLogin(new IntIdentity(1, []), new DateTimeImmutable());
 		$expiredLogin = new ExpiredLogin($currentLogin, LogoutCode::manual());
 
 		$emptyName = 'Orisai.Auth.Logins/empty';

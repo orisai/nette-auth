@@ -68,10 +68,10 @@ Extension registers authorizer for us, we just have to provide authorization dat
 ```neon
 orisai.auth:
 	authorization:
-		data: @creator::build()
+		dataCreator: @creator
 
 services:
-	creator: App\Auth\AuthorizationDataCreator
+	creator: App\Auth\AuthorizationDataCreatorImpl
 ```
 
 ```php
@@ -79,11 +79,12 @@ namespace App\Auth;
 
 use Orisai\Auth\Authorization\AuthorizationData;
 use Orisai\Auth\Authorization\AuthorizationDataBuilder;
+use Orisai\Auth\Authorization\AuthorizationDataCreator;
 
-final class AuthorizationDataCreator
+final class AuthorizationDataCreatorImpl implements AuthorizationDataCreator
 {
 
-	public function build(): AuthorizationData
+	public function create(): AuthorizationData
 	{
 		$builder = new AuthorizationDataBuilder();
 

@@ -3,7 +3,7 @@ extensions:
 
 orisai.auth:
 	authorization:
-		data: @builder::build()
+		dataCreator: @creator
 
 services:
 	builder:
@@ -11,6 +11,7 @@ services:
 		setup:
 			- addPrivilege('always-pass')
 			- addPrivilege('never-pass')
+	creator: Orisai\Auth\Authorization\SimpleAuthorizationDataCreator
 
 	- Tests\OriNette\Auth\Doubles\AlwaysPassPolicy
 	- Tests\OriNette\Auth\Doubles\NeverPassPolicy

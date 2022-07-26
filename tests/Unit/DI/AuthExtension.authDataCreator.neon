@@ -3,7 +3,7 @@ extensions:
 
 orisai.auth:
 	authorization:
-		data: @builder::build()
+		dataCreator: @creator
 
 services:
 	builder:
@@ -11,3 +11,4 @@ services:
 		setup:
 			- addRole('role')
 			- addPrivilege('privilege')
+	creator: Orisai\Auth\Authorization\SimpleAuthorizationDataCreator

@@ -12,7 +12,7 @@ use Orisai\Auth\Authentication\IntIdentity;
 use Orisai\Auth\Authentication\LoginStorage;
 use Orisai\Auth\Authentication\SimpleFirewall;
 use Orisai\Auth\Authorization\AnyUserPolicyContext;
-use Orisai\Auth\Authorization\AuthorizationData;
+use Orisai\Auth\Authorization\AuthorizationDataCreator;
 use Orisai\Auth\Authorization\Authorizer;
 use Orisai\Auth\Authorization\NoRequirements;
 use Orisai\Auth\Authorization\PolicyManager;
@@ -65,10 +65,6 @@ final class AuthExtensionTest extends TestCase
 		self::assertSame([
 			'orisai.auth.storage.array',
 		], $container->findByType(LoginStorage::class));
-
-		$authorizationData = $container->getService('orisai.auth.authorizationData');
-		self::assertInstanceOf(AuthorizationData::class, $authorizationData);
-		self::assertSame($authorizationData, $container->getByType(AuthorizationData::class));
 
 		$authorizer = $container->getService('orisai.auth.authorizer');
 		self::assertInstanceOf(PrivilegeAuthorizer::class, $authorizer);
@@ -199,42 +195,22 @@ MSG);
 		);
 	}
 
-	public function testAuthDataSet(): void
+	public function testAuthDataCreator(): void
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
 		$configurator->setForceReloadContainer();
-		$configurator->addConfig(__DIR__ . '/AuthExtension.authData.neon');
+		$configurator->addConfig(__DIR__ . '/AuthExtension.authDataCreator.neon');
 
 		$container = $configurator->createContainer();
-		$authData = $container->getByType(AuthorizationData::class);
+
+		$authorizer = $container->getByType(Authorizer::class);
+		$authData = $authorizer->getData();
 
 		self::assertSame(['role'], $authData->getRoles());
 		self::assertSame(['privilege'], $authData->getPrivileges());
-	}
 
-	public function testAuthDataReference(): void
-	{
-		$configurator = new ManualConfigurator($this->rootDir);
-		$configurator->setForceReloadContainer();
-		$configurator->addConfig(__DIR__ . '/AuthExtension.authData.reference.neon');
-
-		$container = $configurator->createContainer();
-		$authData = $container->getService('data');
-		self::assertInstanceOf(AuthorizationData::class, $authData);
-		self::assertSame($authData, $container->getService('orisai.auth.authorizationData'));
-		self::assertNull($container->getByType(AuthorizationData::class, false));
-	}
-
-	public function testAuthDataExplicitAutowired(): void
-	{
-		$configurator = new ManualConfigurator($this->rootDir);
-		$configurator->setForceReloadContainer();
-		$configurator->addConfig(__DIR__ . '/AuthExtension.authData.explicitAutowired.neon');
-
-		$container = $configurator->createContainer();
-		$authData = $container->getService('orisai.auth.authorizationData');
-		self::assertInstanceOf(AuthorizationData::class, $authData);
-		self::assertNull($container->getByType(AuthorizationData::class, false));
+		$authDataCreator = $container->getByType(AuthorizationDataCreator::class);
+		self::assertEquals($authData, $authDataCreator->create());
 	}
 
 }

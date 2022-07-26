@@ -4,12 +4,13 @@ extensions:
 
 orisai.auth:
 	authorization:
-		data: @builder::build()
+		dataCreator: @creator
 	debug:
 		panel: true
 
 services:
 	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder
+	creator: Orisai\Auth\Authorization\SimpleAuthorizationDataCreator
 
 	firewall:
 		factory: Orisai\Auth\Authentication\SimpleFirewall

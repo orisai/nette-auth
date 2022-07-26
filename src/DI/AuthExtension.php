@@ -4,10 +4,9 @@ namespace OriNette\Auth\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\DI\ContainerBuilder;
-use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\Definitions\Statement;
 use Nette\Http\Session;
-use Nette\PhpGenerator\Literal;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use OriNette\Auth\Http\SessionLoginStorage;
@@ -15,12 +14,13 @@ use OriNette\Auth\Tracy\AuthPanel;
 use OriNette\DI\Definitions\DefinitionsLoader;
 use Orisai\Auth\Authentication\ArrayLoginStorage;
 use Orisai\Auth\Authentication\Firewall;
-use Orisai\Auth\Authorization\AuthorizationData;
 use Orisai\Auth\Authorization\AuthorizationDataBuilder;
+use Orisai\Auth\Authorization\AuthorizationDataCreator;
 use Orisai\Auth\Authorization\Authorizer;
 use Orisai\Auth\Authorization\Policy;
 use Orisai\Auth\Authorization\PolicyManager;
 use Orisai\Auth\Authorization\PrivilegeAuthorizer;
+use Orisai\Auth\Authorization\SimpleAuthorizationDataCreator;
 use Orisai\Auth\Passwords\Argon2PasswordHasher;
 use Orisai\Auth\Passwords\PasswordHasher;
 use Orisai\Exceptions\Logic\InvalidArgument;
@@ -30,8 +30,6 @@ use stdClass;
 use Tracy\Bar;
 use function assert;
 use function is_a;
-use function is_array;
-use function serialize;
 
 /**
  * @property-read stdClass $config
@@ -47,7 +45,7 @@ final class AuthExtension extends CompilerExtension
 	{
 		return Expect::structure([
 			'authorization' => Expect::structure([
-				'data' => DefinitionsLoader::schema()->nullable(),
+				'dataCreator' => DefinitionsLoader::schema()->nullable(),
 			]),
 			'debug' => Expect::structure([
 				'panel' => Expect::bool(false),
@@ -186,33 +184,21 @@ final class AuthExtension extends CompilerExtension
 		ServiceDefinition $policyManagerDefinition
 	): void
 	{
-		$dataConfig = $config->authorization->data;
-		if ($dataConfig === null) {
-			$authData = (new AuthorizationDataBuilder())->build();
-			$authorizationDataDefinition = $builder->addDefinition($this->prefix('authorizationData'))
-				->setFactory('\unserialize(\'?\', [?])', [
-					new Literal(serialize($authData)),
-					AuthorizationData::class,
-				])
-				->setType(AuthorizationData::class);
-		} else {
-			$authorizationDataDefinition = $loader->loadDefinitionFromConfig(
+		$dataConfig = $config->authorization->dataCreator;
+		$dataCreatorServiceName = $this->prefix('authorizationDataCreator');
+		$authorizationDataCreatorDefinition = $dataConfig === null ? $builder->addDefinition($dataCreatorServiceName)
+			->setFactory(SimpleAuthorizationDataCreator::class, [
+				'builder' => new Statement(AuthorizationDataBuilder::class),
+			])
+			->setType(AuthorizationDataCreator::class) : $loader->loadDefinitionFromConfig(
 				$dataConfig,
-				$this->prefix('authorizationData'),
+				$dataCreatorServiceName,
 			);
-		}
-
-		if (
-			(!is_array($dataConfig) || !isset($dataConfig['autowired']))
-			&& !$authorizationDataDefinition instanceof Reference
-		) {
-			$authorizationDataDefinition->setAutowired();
-		}
 
 		$builder->addDefinition($this->prefix('authorizer'))
 			->setFactory(PrivilegeAuthorizer::class, [
 				$policyManagerDefinition,
-				$authorizationDataDefinition,
+				$authorizationDataCreatorDefinition,
 			])
 			->setType(Authorizer::class);
 	}
