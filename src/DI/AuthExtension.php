@@ -4,7 +4,6 @@ namespace OriNette\Auth\DI;
 
 use Nette\DI\CompilerExtension;
 use Nette\DI\ContainerBuilder;
-use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\Http\Session;
 use Nette\PhpGenerator\Literal;
@@ -30,7 +29,6 @@ use stdClass;
 use Tracy\Bar;
 use function assert;
 use function is_a;
-use function is_array;
 use function serialize;
 
 /**
@@ -47,7 +45,7 @@ final class AuthExtension extends CompilerExtension
 	{
 		return Expect::structure([
 			'authorization' => Expect::structure([
-				'data' => DefinitionsLoader::schema()->nullable(),
+				'dataCreator' => DefinitionsLoader::schema()->nullable(),
 			]),
 			'debug' => Expect::structure([
 				'panel' => Expect::bool(false),
@@ -186,33 +184,26 @@ final class AuthExtension extends CompilerExtension
 		ServiceDefinition $policyManagerDefinition
 	): void
 	{
-		$dataConfig = $config->authorization->data;
+		$dataConfig = $config->authorization->dataCreator;
 		if ($dataConfig === null) {
 			$authData = (new AuthorizationDataBuilder())->build();
-			$authorizationDataDefinition = $builder->addDefinition($this->prefix('authorizationData'))
+			$authorizationDataCreatorDefinition = $builder->addDefinition($this->prefix('authorizationDataCreator'))
 				->setFactory('\unserialize(\'?\', [?])', [
 					new Literal(serialize($authData)),
 					AuthorizationData::class,
 				])
 				->setType(AuthorizationData::class);
 		} else {
-			$authorizationDataDefinition = $loader->loadDefinitionFromConfig(
+			$authorizationDataCreatorDefinition = $loader->loadDefinitionFromConfig(
 				$dataConfig,
 				$this->prefix('authorizationData'),
 			);
 		}
 
-		if (
-			(!is_array($dataConfig) || !isset($dataConfig['autowired']))
-			&& !$authorizationDataDefinition instanceof Reference
-		) {
-			$authorizationDataDefinition->setAutowired();
-		}
-
 		$builder->addDefinition($this->prefix('authorizer'))
 			->setFactory(PrivilegeAuthorizer::class, [
 				$policyManagerDefinition,
-				$authorizationDataDefinition,
+				$authorizationDataCreatorDefinition,
 			])
 			->setType(Authorizer::class);
 	}

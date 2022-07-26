@@ -4,7 +4,7 @@ extensions:
 
 orisai.auth:
 	authorization:
-		data: @builder::build()
+		dataCreator: @builder::build()
 	debug:
 		panel: true
 

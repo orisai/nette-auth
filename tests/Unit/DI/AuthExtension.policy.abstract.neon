@@ -3,7 +3,7 @@ extensions:
 
 orisai.auth:
 	authorization:
-		data: @builder::build()
+		dataCreator: @builder::build()
 
 services:
 	builder: Orisai\Auth\Authorization\AuthorizationDataBuilder
