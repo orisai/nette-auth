@@ -7,6 +7,9 @@ use Orisai\Auth\Authentication\Identity;
 use Tracy\Helpers;
 use Tracy\IBarPanel;
 
+/**
+ * @internal
+ */
 final class AuthPanel implements IBarPanel
 {
 

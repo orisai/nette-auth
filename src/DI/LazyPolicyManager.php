@@ -9,6 +9,9 @@ use Orisai\Exceptions\Logic\InvalidArgument;
 use Orisai\Exceptions\Message;
 use function get_class;
 
+/**
+ * @internal
+ */
 final class LazyPolicyManager extends ServiceManager implements PolicyManager
 {
 
