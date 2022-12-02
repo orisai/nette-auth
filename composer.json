@@ -2,11 +2,15 @@
 	"name": "orisai/nette-auth",
 	"description": "Orisai Auth integration for Nette",
 	"keywords": [
+		"acl",
 		"auth",
 		"authentication",
 		"authorization",
 		"nette",
 		"orisai",
+		"password",
+		"passwords",
+		"permissions",
 		"security"
 	],
 	"type": "library",
