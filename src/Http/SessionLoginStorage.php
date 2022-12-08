@@ -13,7 +13,7 @@ final class SessionLoginStorage implements LoginStorage
 
 	private Session $session;
 
-	/** @var array<Logins> */
+	/** @var array<string, Logins> */
 	private array $logins = [];
 
 	public function __construct(Session $session)
