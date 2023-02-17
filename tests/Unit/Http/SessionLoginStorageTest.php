@@ -119,4 +119,24 @@ final class SessionLoginStorageTest extends TestCase
 		self::assertTrue($session->hasSection($expiredName));
 	}
 
+	public function testNumericNamespace(): void
+	{
+		$session = $this->createSession();
+		$storage = $this->createStorage($session);
+
+		$namespace = '123';
+
+		self::assertFalse($storage->alreadyExists($namespace));
+		$logins = $storage->getLogins($namespace);
+		self::assertSame($logins, $storage->getLogins($namespace));
+		self::assertTrue($storage->alreadyExists($namespace));
+
+		$sessionId = $session->getId();
+		$storage->regenerateSecurityToken($namespace);
+		self::assertNotSame($sessionId, $session->getId());
+
+		unset($storage);
+		self::assertFalse($session->hasSection("Orisai.Auth.Logins/$namespace"));
+	}
+
 }

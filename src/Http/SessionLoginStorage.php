@@ -13,7 +13,7 @@ final class SessionLoginStorage implements LoginStorage
 
 	private Session $session;
 
-	/** @var array<string, Logins> */
+	/** @var array<int|string, Logins> */
 	private array $logins = [];
 
 	public function __construct(Session $session)
@@ -77,7 +77,7 @@ final class SessionLoginStorage implements LoginStorage
 	{
 		foreach ($this->logins as $namespace => $login) {
 			if ($login->getCurrentLogin() === null && $login->getExpiredLogins() === []) {
-				$this->session->getSection($this->formatSectionName($namespace))->remove();
+				$this->session->getSection($this->formatSectionName((string) $namespace))->remove();
 			}
 		}
 	}
