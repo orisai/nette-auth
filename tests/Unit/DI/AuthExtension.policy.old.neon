@@ -1,0 +1,17 @@
+extensions:
+	orisai.auth: OriNette\Auth\DI\AuthExtension
+
+orisai.auth:
+	authorization:
+		dataCreator: @creator
+
+services:
+	builder:
+		factory: Orisai\Auth\Authorization\AuthorizationDataBuilder
+		setup:
+			- addPrivilege('always-pass')
+			- addPrivilege('never-pass')
+	creator: Orisai\Auth\Authorization\SimpleAuthorizationDataCreator
+
+	- Tests\OriNette\Auth\Doubles\OldAlwaysPassPolicy
+	- Tests\OriNette\Auth\Doubles\OldNeverPassPolicy

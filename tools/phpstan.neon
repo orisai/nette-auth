@@ -25,3 +25,9 @@ parameters:
 		-
 			message: '#^(.+)generic interface Orisai\\Auth\\Authorization\\Policy(.+)$#'
 			path: ../src/DI/LazyPolicyManager.php
+
+
+	excludePaths:
+		# Auth v1 compatibility
+		- ../tests/Doubles/OldAlwaysPassPolicy.php
+		- ../tests/Doubles/OldNeverPassPolicy.php

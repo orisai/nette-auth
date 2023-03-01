@@ -2,10 +2,7 @@
 
 namespace Tests\OriNette\Auth\Doubles;
 
-use Generator;
 use Orisai\Auth\Authentication\Identity;
-use Orisai\Auth\Authorization\AccessEntry;
-use Orisai\Auth\Authorization\AccessEntryResult;
 use Orisai\Auth\Authorization\NoRequirements;
 use Orisai\Auth\Authorization\Policy;
 use Orisai\Auth\Authorization\PolicyContext;
@@ -13,7 +10,7 @@ use Orisai\Auth\Authorization\PolicyContext;
 /**
  * @implements Policy<NoRequirements>
  */
-final class NeverPassPolicy implements Policy
+final class OldNeverPassPolicy implements Policy
 {
 
 	public static function getPrivilege(): string
@@ -26,12 +23,9 @@ final class NeverPassPolicy implements Policy
 		return NoRequirements::class;
 	}
 
-	public function isAllowed(Identity $identity, object $requirements, PolicyContext $context): Generator
+	public function isAllowed(Identity $identity, object $requirements, PolicyContext $context): bool
 	{
-		yield new AccessEntry(
-			AccessEntryResult::forbidden(),
-			'[internal behavior] forbidden',
-		);
+		return false;
 	}
 
 }

@@ -11,10 +11,9 @@ use Orisai\Auth\Authentication\Firewall;
 use Orisai\Auth\Authentication\IntIdentity;
 use Orisai\Auth\Authentication\LoginStorage;
 use Orisai\Auth\Authentication\SimpleFirewall;
-use Orisai\Auth\Authorization\AnyUserPolicyContext;
+use Orisai\Auth\Authorization\AccessEntry;
 use Orisai\Auth\Authorization\AuthorizationDataCreator;
 use Orisai\Auth\Authorization\Authorizer;
-use Orisai\Auth\Authorization\NoRequirements;
 use Orisai\Auth\Authorization\PolicyManager;
 use Orisai\Auth\Authorization\PrivilegeAuthorizer;
 use Orisai\Auth\Passwords\Argon2PasswordHasher;
@@ -23,7 +22,10 @@ use Orisai\Exceptions\Logic\InvalidArgument;
 use PHPUnit\Framework\TestCase;
 use Tests\OriNette\Auth\Doubles\AlwaysPassPolicy;
 use Tests\OriNette\Auth\Doubles\NeverPassPolicy;
+use Tests\OriNette\Auth\Doubles\OldAlwaysPassPolicy;
+use Tests\OriNette\Auth\Doubles\OldNeverPassPolicy;
 use Tracy\Bar;
+use function class_exists;
 use function dirname;
 use function mkdir;
 use const PHP_VERSION_ID;
@@ -103,7 +105,11 @@ final class AuthExtensionTest extends TestCase
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
 		$configurator->setForceReloadContainer();
-		$configurator->addConfig(__DIR__ . '/AuthExtension.policy.neon');
+		if (class_exists(AccessEntry::class)) {
+			$configurator->addConfig(__DIR__ . '/AuthExtension.policy.neon');
+		} else {
+			$configurator->addConfig(__DIR__ . '/AuthExtension.policy.old.neon');
+		}
 
 		$container = $configurator->createContainer();
 
@@ -116,20 +122,21 @@ final class AuthExtensionTest extends TestCase
 		self::assertNull($container->getByType(PolicyManager::class, false));
 
 		$identity = new IntIdentity(1, []);
-		$context = new AnyUserPolicyContext($authorizer);
 
 		$missingPolicy = $policyManager->get('missing');
 		self::assertNull($missingPolicy);
 
-		$neverPassPolicy = $policyManager->get(NeverPassPolicy::getPrivilege());
-		self::assertInstanceOf(NeverPassPolicy::class, $neverPassPolicy);
-		self::assertFalse($neverPassPolicy->isAllowed($identity, new NoRequirements(), $context));
-		self::assertFalse($authorizer->isAllowed($identity, NeverPassPolicy::getPrivilege()));
+		$neverPassPolicyClass = class_exists(AccessEntry::class) ? NeverPassPolicy::class : OldNeverPassPolicy::class;
+		$neverPassPolicy = $policyManager->get($neverPassPolicyClass::getPrivilege());
+		self::assertInstanceOf($neverPassPolicyClass, $neverPassPolicy);
+		self::assertFalse($authorizer->isAllowed($identity, $neverPassPolicyClass::getPrivilege()));
 
-		$alwaysPassPolicy = $policyManager->get(AlwaysPassPolicy::getPrivilege());
-		self::assertInstanceOf(AlwaysPassPolicy::class, $alwaysPassPolicy);
-		self::assertTrue($alwaysPassPolicy->isAllowed($identity, new NoRequirements(), $context));
-		self::assertTrue($authorizer->isAllowed($identity, AlwaysPassPolicy::getPrivilege()));
+		$alwaysPassPolicyClass = class_exists(
+			AccessEntry::class,
+		) ? AlwaysPassPolicy::class : OldAlwaysPassPolicy::class;
+		$alwaysPassPolicy = $policyManager->get($alwaysPassPolicyClass::getPrivilege());
+		self::assertInstanceOf($alwaysPassPolicyClass, $alwaysPassPolicy);
+		self::assertTrue($authorizer->isAllowed($identity, $alwaysPassPolicyClass::getPrivilege()));
 	}
 
 	public function testPolicyIsWrong(): void
@@ -139,11 +146,13 @@ final class AuthExtensionTest extends TestCase
 		$configurator->addConfig(__DIR__ . '/AuthExtension.policy.abstract.neon');
 
 		$this->expectException(InvalidArgument::class);
-		$this->expectExceptionMessage(<<<'MSG'
+		$this->expectExceptionMessage(
+			<<<'MSG'
 Context: Adding 'abstractPolicy' service to policy manager.
 Problem: Service type is an abstract class and cannot be resolved.
 Solution: Add only non-abstract policies to services.
-MSG);
+MSG,
+		);
 
 		$configurator->createContainer();
 	}
