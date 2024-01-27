@@ -8,6 +8,8 @@ use Orisai\Auth\Authorization\Policy;
 use Orisai\Auth\Authorization\PolicyContext;
 
 /**
+ * Compat - orisai/auth v1
+ *
  * @implements Policy<NoRequirements>
  */
 final class OldAlwaysPassPolicy implements Policy

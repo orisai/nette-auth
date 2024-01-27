@@ -1,3 +1,4 @@
+# Compat - orisai/auth v1
 extensions:
 	orisai.auth: OriNette\Auth\DI\AuthExtension
 

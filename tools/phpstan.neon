@@ -28,6 +28,6 @@ parameters:
 
 
 	excludePaths:
-		# Auth v1 compatibility
+		# Compat - orisai/auth v1
 		- ../tests/Doubles/OldAlwaysPassPolicy.php
 		- ../tests/Doubles/OldNeverPassPolicy.php

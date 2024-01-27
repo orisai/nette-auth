@@ -105,6 +105,7 @@ final class AuthExtensionTest extends TestCase
 	{
 		$configurator = new ManualConfigurator($this->rootDir);
 		$configurator->setForceReloadContainer();
+		// Compat - orisai/auth v1
 		if (class_exists(AccessEntry::class)) {
 			$configurator->addConfig(__DIR__ . '/AuthExtension.policy.neon');
 		} else {
@@ -126,11 +127,13 @@ final class AuthExtensionTest extends TestCase
 		$missingPolicy = $policyManager->get('missing');
 		self::assertNull($missingPolicy);
 
+		// Compat - orisai/auth v1
 		$neverPassPolicyClass = class_exists(AccessEntry::class) ? NeverPassPolicy::class : OldNeverPassPolicy::class;
 		$neverPassPolicy = $policyManager->get($neverPassPolicyClass::getPrivilege());
 		self::assertInstanceOf($neverPassPolicyClass, $neverPassPolicy);
 		self::assertFalse($authorizer->isAllowed($identity, $neverPassPolicyClass::getPrivilege()));
 
+		// Compat - orisai/auth v1
 		$alwaysPassPolicyClass = class_exists(
 			AccessEntry::class,
 		) ? AlwaysPassPolicy::class : OldAlwaysPassPolicy::class;

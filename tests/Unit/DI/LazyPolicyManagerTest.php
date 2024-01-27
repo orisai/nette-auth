@@ -43,6 +43,7 @@ final class LazyPolicyManagerTest extends TestCase
 
 		$manager = $container->getByType(LazyPolicyManager::class);
 
+		// Compat - orisai/auth v1
 		if (class_exists(AccessEntry::class)) {
 			self::assertInstanceOf(AlwaysPassPolicy::class, $manager->get(AlwaysPassPolicy::getPrivilege()));
 		} else {
