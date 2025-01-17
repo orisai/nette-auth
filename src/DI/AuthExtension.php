@@ -186,11 +186,13 @@ final class AuthExtension extends CompilerExtension
 	{
 		$dataConfig = $config->authorization->dataCreator;
 		$dataCreatorServiceName = $this->prefix('authorizationDataCreator');
-		$authorizationDataCreatorDefinition = $dataConfig === null ? $builder->addDefinition($dataCreatorServiceName)
+		$authorizationDataCreatorDefinition = $dataConfig === null
+			? $builder->addDefinition($dataCreatorServiceName)
 			->setFactory(SimpleAuthorizationDataCreator::class, [
 				'builder' => new Statement(AuthorizationDataBuilder::class),
 			])
-			->setType(AuthorizationDataCreator::class) : $loader->loadDefinitionFromConfig(
+			->setType(AuthorizationDataCreator::class)
+			: $loader->loadDefinitionFromConfig(
 				$dataConfig,
 				$dataCreatorServiceName,
 			);
