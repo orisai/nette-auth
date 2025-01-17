@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE neon PUBLIC "-//NEON//Neon plugin XML V0.0.1//EN" "../.idea/intellij-neon-pro/xmlSources/Neon.xsd">
+<neon vendor="orisai/nette-auth" version="1">
+	<extensions>
+		<extension type="OriNette\Auth\DI\AuthExtension">
+			<schema>
+				<structure>
+					<field name="authorization">
+						<structure>
+							<field name="dataCreator" default="null">
+								<useReusable ref="nullable-definition"/>
+							</field>
+						</structure>
+					</field>
+					<field name="debug">
+						<structure>
+							<field name="panel" default="false">
+								<bool/>
+							</field>
+						</structure>
+					</field>
+				</structure>
+			</schema>
+			<services>
+				<service name="panel" type="OriNette\Auth\Tracy\AuthPanel"/>
+				<service name="passwordHasher" type="Orisai\Auth\Passwords\PasswordHasher"/>
+				<service name="storage.array" type="Orisai\Auth\Authentication\ArrayLoginStorage"/>
+				<service name="storage.session" type="OriNette\Auth\Http\SessionLoginStorage"/>
+				<service name="policyManager" type="Orisai\Auth\Authorization\PolicyManager"/>
+				<service name="authorizationDataCreator" type="Orisai\Auth\Authorization\AuthorizationDataCreator"/>
+				<service name="authorizer" type="Orisai\Auth\Authorization\Authorizer"/>
+			</services>
+		</extension>
+	</extensions>
+	<reusables>
+		<reusable id="nullable-definition">
+			<string/>
+			<arrayOf>
+				<key>
+					<int/>
+					<string/>
+				</key>
+				<value>
+					<mixed/>
+				</value>
+			</arrayOf>
+			<type value="object"/>
+			<null/>
+		</reusable>
+	</reusables>
+</neon>
